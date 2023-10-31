@@ -1,0 +1,32 @@
+{
+  "development": {
+    "username": "postgres",
+    "password": "Admin@123",
+    "database": "trytechit",
+    "host": "localhost",
+    "dialect": "postgres",
+    "port":5432
+  },
+  "development_local": {
+    "username": "postgres",
+    "password": "Admin@123",
+    "database": "postgres",
+    "host": "localhost",
+    "dialect": "postgres",
+    "port":5432
+  },
+  "test": {
+    "username": "your_username",
+    "password": "your_password",
+    "database": "your_database_name",
+    "host": "localhost",
+    "dialect": "postgres"
+  },
+  "production": {
+    "username": "your_username",
+    "password": "your_password",
+    "database": "your_database_name",
+    "host": "localhost",
+    "dialect": "postgres"
+  }
+}
