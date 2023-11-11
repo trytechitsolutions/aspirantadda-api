@@ -1,7 +1,7 @@
 const { Sequelize, DataTypes } = require('sequelize');
 const { sequelize } = require('../config/sequelize');
 
-const Users = sequelize.define('users', {
+const Users = sequelize.define('users1', {
     id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
@@ -77,7 +77,7 @@ const Users = sequelize.define('users', {
         defaultValue: '',
     }
 }, {
-    tableName:'users',
+    tableName:'users1',
     // Define unique constraints
     indexes: [
         {

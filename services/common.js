@@ -17,7 +17,7 @@ module.exports = {
         const token = jwt.sign({
             id: data.id,
             dbName: data.dbName,
-            schemaName: data.schemaName,
+            schemaName: data.schema_name,
             role: data.role
         },
             config.jwtSecretKey,

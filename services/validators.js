@@ -36,10 +36,10 @@ module.exports = {
     body('password').isString().isLength({ min: 8 }).withMessage('password is required with min 8 characters'),
   ],
   Users: [
-    body('firstName').isString().isLength({ min: 4 }).withMessage('first name required with min 4 characters'),
-    body('lastName').isString().isLength({ min: 4 }).withMessage('last name required with min 4 characters'),
+    body('first_name').isString().isLength({ min: 4 }).withMessage('first name required with min 4 characters'),
+    body('last_name').isString().isLength({ min: 4 }).withMessage('last name required with min 4 characters'),
     body('email').isEmail().withMessage('Invalid Email'),
-    body('mobilePhone').isMobilePhone().withMessage('invalid mobile number'),
+    body('mobile_phone').isMobilePhone().withMessage('invalid mobile number'),
     // body('role').isString().isLength({ min: 1 }).withMessage('user role required with min 4 characters'),
     body('password').isStrongPassword().withMessage('Please provide valid password'),
   ],

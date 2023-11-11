@@ -8,7 +8,6 @@ const jwt = require('jsonwebtoken');
 const commonService = require('./services/common');
 const dbConnection = require('./db/dbConnection');
 const { sequelize, setSchema } = require('./config/sequelize');
-const path = require('path');
 const logger = require('./logger');
 sequelize.sync({ alter: true }); // Synchronize the models with the database
 dbConnection.testDatabaseConnection();
@@ -28,12 +27,7 @@ app.use(async function (req, res, next) {
       const isTokenValid = jwt.verify(req.headers.authorization, config.jwtSecretKey);
       if (isTokenValid) {
         const updatedToken = commonService.updateToken(req.headers.authorization);
-        const { schemaName, role, id } = commonService.parseJwt(req.headers.authorization);
-        let schema = schemaName;
-        if (role?.toLowerCase() === 'super') {
-          schema = 'public';
-        }
-        await setSchema(schema);
+        commonService.parseJwt(req.headers.authorization);
         /**
          * TODO for super admin to switch between the schemas
          */

@@ -12,10 +12,21 @@ const bookSchema = Joi.object({
   });
   const academySchema = Joi.object({
     name: Joi.string().required(),
-    shortDescription: Joi.string().required(),
-    longDescription: Joi.string().required()
+    short_description: Joi.string().required(),
+    long_description: Joi.string().required()
   });
+  const profileSchema =  Joi.object({
+    firstName: Joi.string().required(),
+    lastName: Joi.string().required(),
+    middleName:Joi.string().required(),
+    email: Joi.string().required(),
+    brandName: Joi.string().required(),
+    logo: Joi.string().optional(),
+    mobilePhone: Joi.string().required(),
+    role: Joi.string().required()
+  })
   module.exports = {
     bookSchema,
-    academySchema
+    academySchema,
+    profileSchema
   }

@@ -1,0 +1,21 @@
+[`CREATE TABLE public.users (
+    id serial4 NOT NULL,
+    first_name varchar(255) NOT NULL,
+    last_name varchar(255) NOT NULL,
+    middle_name varchar(255),
+    email varchar(255) NOT NULL,
+    brand_name varchar(255),
+    logo varchar(255),
+    mobile_phone varchar(255) NOT NULL,
+    schema_name varchar(255) NOT NULL,
+    role varchar(255) NOT NULL,
+    password varchar(255) NOT NULL,
+    otp varchar(255),
+    is_active bool NOT NULL DEFAULT true,
+    created_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by varchar(255) NOT NULL DEFAULT ''::character varying,
+    updated_by varchar(255) NOT NULL DEFAULT ''::character varying,
+    CONSTRAINT users_pkey PRIMARY KEY (id),
+    CONSTRAINT unique_email_mobilePhone UNIQUE (email, mobile_phone)
+);`]

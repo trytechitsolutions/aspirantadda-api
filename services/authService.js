@@ -14,7 +14,13 @@ async function login(req, t) {
     try {
         const { email, password } = req.body;
         
-        const logginData = await genericService.findOneRecord(req, Users, { email: email }, t);
+       const selColmns = `id, first_name, last_name, middle_name, email, brand_name, logo, mobile_phone, role, schema_name, password `
+        const query = `SELECT ${selColmns} FROM users where email='${email}'`;
+        const data = await genericService.executeRawSelectQuery(query, 'public', t);
+        let logginData;
+        if(data?.length >0){
+            logginData = data[0];
+        }
         if (!logginData || (logginData?.length === 0)) {
             await t.rollback();
             return { message: "Not found." };
@@ -32,17 +38,6 @@ async function login(req, t) {
 
         }
         const userToken = await commonService.generateToken(logginData);
-        // const defaultcomponents = config.defaultComponentsForAdminLogin;
-        // let components = await genericService.readAllRecords(req, Components, {}, t);
-        // components = _.get(components, 'rows')
-        // components = components?.map((row) => row.get({ plain: true }));
-        // if (type.toLowerCase() === 'admin') {
-        //     if (components?.length) {
-        //         components = components.concat(defaultcomponents)
-        //     } else {
-        //         components = defaultcomponents
-        //     }
-        // }
         await t.commit();
         return {
             id: logginData.id,
@@ -60,9 +55,10 @@ async function register(req, t) {
         const reqObj = req.body;
         reqObj.password = bcrypt.hashSync(reqObj.password, 8);
         const schemaName = Math.floor(new Date().getTime() / 1000).toString();
-        reqObj.schemaName = 's_'+schemaName;
-        await genericService.createRecord(req, Users, reqObj, t);
-        await synchronizeSchema('public', reqObj.schemaName);
+        reqObj.schema_name = 's_'+schemaName;
+       await genericService.createRecordRaw('users', reqObj, 'public', t);
+       const ddlQuery = ddl.nonPublicDDl[0].replace(/uniqueSchemaName/g, reqObj.schema_name);
+       await genericService.copyTables(`CREATE SCHEMA ${reqObj.schema_name} AUTHORIZATION postgres;`+ ddlQuery, t)
         await t.commit();
         return true;
     } catch (err) {
