@@ -2,6 +2,7 @@ const cors = require("cors");
 const express = require('express');
 const authRoutes = require('./routes/authRoutes');
 const prefRoutes = require('./routes/preferenceRoutes');
+const kycRoutes = require('./routes/kycRoutes');
 const config = require('./config/constants');
 const app = express();
 const jwt = require('jsonwebtoken');
@@ -18,6 +19,7 @@ app.use(cors({ origin: "*" }));  // Set up CORS middleware first
 app.use(express.json());
 apiRoutes.use('/auth', authRoutes);
 apiRoutes.use('/preference', prefRoutes);
+apiRoutes.use('/kyc', kycRoutes);
 app.use(async function (req, res, next) {
   if(req.headers.authorization === '1'){
     next();

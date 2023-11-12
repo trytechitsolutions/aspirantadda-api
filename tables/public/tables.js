@@ -18,4 +18,21 @@
     updated_by varchar(255) NOT NULL DEFAULT ''::character varying,
     CONSTRAINT users_pkey PRIMARY KEY (id),
     CONSTRAINT unique_email_mobilePhone UNIQUE (email, mobile_phone)
-);`]
+);
+CREATE TABLE public.kyc (
+    id serial4 NOT NULL,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    id_proof varchar(255) NOT NULL,
+    gst_number varchar(255) NOT NULL,
+    bank_account_number varchar(255) NOT NULL,
+    bank_account_name varchar(255) NOT NULL,
+    bank_branch varchar(255) NOT NULL,
+    bank_ifsc_code varchar(255) NOT NULL,
+    is_active bool NOT NULL DEFAULT true,
+    created_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by varchar(255) NOT NULL DEFAULT ''::character varying,
+    updated_by varchar(255) NOT NULL DEFAULT ''::character varying,
+    CONSTRAINT kyc_pkey PRIMARY KEY (id)
+);
+`]
