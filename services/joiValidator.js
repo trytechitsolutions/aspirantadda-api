@@ -24,7 +24,15 @@ const profileSchema = Joi.object({
   logo: Joi.string().optional(),
   mobilePhone: Joi.string().required(),
   role: Joi.string().required()
-})
+});
+const componentSchema = Joi.object({
+  title: Joi.string().required(),
+  path: Joi.string().required()
+});
+const roleSchema = Joi.object({
+  name: Joi.string().required(),
+  is_active: Joi.boolean().required()
+});
 const kycSchema = Joi.object({
   user_id: Joi.number().required(),
   gst_number: Joi.string().required(),
@@ -38,5 +46,7 @@ module.exports = {
   bookSchema,
   academySchema,
   profileSchema,
-  kycSchema
+  kycSchema,
+  componentSchema,
+  roleSchema
 }

@@ -35,4 +35,16 @@ CREATE TABLE public.kyc (
     updated_by varchar(255) NOT NULL DEFAULT ''::character varying,
     CONSTRAINT kyc_pkey PRIMARY KEY (id)
 );
+CREATE TABLE public.components (
+    id serial4 NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    path VARCHAR(255) NOT NULL,
+   	is_active bool NOT NULL DEFAULT true,
+    created_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by varchar(255) NOT NULL DEFAULT ''::character varying,
+    updated_by varchar(255) NOT NULL DEFAULT ''::character varying,
+    CONSTRAINT components_pkey PRIMARY KEY (id)
+);
+CREATE UNIQUE INDEX components_title ON public.components USING btree (title);
 `]

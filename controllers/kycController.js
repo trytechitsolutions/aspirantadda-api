@@ -9,8 +9,8 @@ module.exports = {
         try {
             const { id } = commonService.parseJwt(req.headers.authorization);
             const selColmns = `id, gst_number, bank_account_number, bank_account_name, bank_branch, bank_ifsc_code, id_proof`
-            const query = `SELECT ${selColmns} FROM kyc where user_id=${id}`;
-            const data = await genericService.executeRawSelectQuery(query, 'public', t);
+            const query = `SELECT ${selColmns} FROM public.kyc where user_id=${id}`;
+            const data = await genericService.executeRawSelectQuery(query, t);
             await t.commit();
             if(data?.length>0){
                 return data[0];

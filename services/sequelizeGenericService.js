@@ -45,11 +45,10 @@ async function readAllRecords(req, model, whereClause = {}, transaction) {
 
 
 }
-const executeRawSelectQuery = async (query, schema, transaction) => {
+const executeRawSelectQuery = async (query, transaction) => {
   try {
     const result = await sequelize.query(query, {
       type: QueryTypes.SELECT,
-      searchPath: schema, // Specify the schema here,
       transaction
     });
 
@@ -59,6 +58,19 @@ const executeRawSelectQuery = async (query, schema, transaction) => {
     throw new Error('Failed to execute raw query: ' + error.message);
   }
 }
+const executeRawDeleteQuery = async (query, transaction) => {
+  try {
+    const result = await sequelize.query(query, {
+      type: QueryTypes.RAW,
+      transaction
+    });
+
+    return result;
+  } catch (error) {
+    console.error('Error executing raw delete query:', error);
+    throw new Error('Failed to execute raw delete query: ' + error.message);
+  }
+};
 const copyTables = async (query, transaction) => {
   try {
     const result = await sequelize.query(query, {
@@ -116,9 +128,11 @@ async function createRecordRaw(tableName, data, schema, transaction) {
     const values = Object.values(data).map((value) => typeof value === 'string' ? `'${value}'` : value).join(', ');
 
     const query = `INSERT INTO ${schema}.${tableName} (${columns}) VALUES (${values}) RETURNING *;`;
-    const result = await sequelize.query(query, { type: sequelize.QueryTypes.INSERT, 
+    const result = await sequelize.query(query, {
+      type: sequelize.QueryTypes.INSERT,
       // searchPath: schema,
-       transaction });
+      transaction
+    });
 
     // Extract the inserted record from the result
     const insertedRecord = result.length > 0 ? result[0] : null;
@@ -139,9 +153,9 @@ async function updateRecordRaw(tableName, data, condition, schema, transaction) 
       .map(([key, value]) => `${key} = ${typeof value === 'string' ? `'${value}'` : value}`)
       .join(' AND ');
 
-    const query = `UPDATE ${tableName} SET ${setClause} WHERE ${whereClause} RETURNING *;`;
+    const query = `UPDATE ${schema}.${tableName} SET ${setClause} WHERE ${whereClause} RETURNING *;`;
 
-    const result = await sequelize.query(query, { type: sequelize.QueryTypes.UPDATE, searchPath: schema, transaction });
+    const result = await sequelize.query(query, { type: sequelize.QueryTypes.UPDATE, transaction });
 
     // Extract the updated record from the result
     const updatedRecord = result.length > 0 ? result[0] : null;
@@ -152,6 +166,54 @@ async function updateRecordRaw(tableName, data, condition, schema, transaction) 
     throw new Error('Failed to update the record: ' + error.message);
   }
 }
+async function createManyRaw(tableName, data, schema, transaction) {
+  try {
+    const columns = Object.keys(data[0]);
+    const valuesPlaceholder = data.map((_, index) => `(${columns.map((_, colIndex) => `$${index * columns.length + colIndex + 1}`).join(', ')})`).join(', ');
+
+    const query = `INSERT INTO ${schema}.${tableName} (${columns.join(', ')}) VALUES ${valuesPlaceholder} RETURNING *;`;
+
+    const flattenedData = data.reduce((acc, record) => acc.concat(Object.values(record)), []);
+
+    const result = await sequelize.query(query, {
+      type: sequelize.QueryTypes.INSERT,
+      bind: flattenedData,
+      transaction,
+    });
+
+    // Extract the inserted records from the result
+    const insertedRecords = result.length > 0 ? result : null;
+
+    return insertedRecords;
+  } catch (error) {
+    console.error('Error creating record:', error);
+    throw new Error('Failed to create the record: ' + error.message);
+  }
+}
+
+async function updateManyRaw(tableName, data, condition, schema, transaction) {
+  try {
+    const setClause = Object.keys(data[0]).map((key, index) => `${key} = $${index + 1}`).join(', ');
+    const whereClause = Object.keys(condition).map((key, index) => `${key} = $${index + 1 + Object.keys(data[0]).length}`).join(' AND ');
+
+    const query = `UPDATE ${schema}.${tableName} SET ${setClause} WHERE ${whereClause} RETURNING *;`;
+
+    const result = await sequelize.query(query, {
+      type: sequelize.QueryTypes.UPDATE,
+      bind: [...data.flat(), ...Object.values(condition)], // Flatten and bind values to replace placeholders
+      transaction,
+    });
+
+    // Extract the updated records from the result
+    const updatedRecords = result.length > 0 ? result : null;
+
+    return updatedRecords;
+  } catch (error) {
+    console.error('Error updating records:', error);
+    throw new Error('Failed to update the records: ' + error.message);
+  }
+}
+
 
 module.exports = {
   executeRawQuery,
@@ -164,5 +226,8 @@ module.exports = {
   executeRawSelectQuery,
   createRecordRaw,
   updateRecordRaw,
-  copyTables
+  copyTables,
+  createManyRaw,
+  updateManyRaw,
+  executeRawDeleteQuery
 };

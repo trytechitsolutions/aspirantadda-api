@@ -6,7 +6,7 @@ const validators = require('../services/validators');
 const validateHandlers = require('../services/validationHandler');
 const { sendSuccessResponse, sendErrorResponse } = require('../utils/sendResponse');
 const createFileUploadMiddleware = require('../services/fileUploadService');
-const { academySchema, profileSchema } = require('../services/joiValidator');
+const { academySchema, profileSchema, componentSchema, roleSchema } = require('../services/joiValidator');
 
 const upload = createFileUploadMiddleware('bookbo');
 
@@ -57,7 +57,97 @@ router.post('/user', upload.fields([
             sendErrorResponse(res, 500, 'AuthRoutes::/signin::', err);
         }
     });
-
+router.post('/components', async function (req, res, next) {
+    try {
+        const dataToValidate = {
+            path: req.body.path,
+            title: req.body.title
+        };
+        const { error, value } = componentSchema.validate(dataToValidate);
+        if (error) {
+            sendErrorResponse(res, 400, error.details[0].message, 'Preferences Routes:: save components');
+        } else {
+            const response = await preferenceController.saveOrUpdateComponents(req, res);
+            if (response.message) {
+                sendErrorResponse(res, 400, 'AuthRoutes::/signin::', response.message);
+            } else {
+                sendSuccessResponse(res, 'Success', response);
+            }
+        }
+    } catch (err) {
+        sendErrorResponse(res, 500, 'AuthRoutes::/signin::', err);
+    }
+});
+router.get('/components', async function (req, res, next) {
+    try {
+        const response = await preferenceController.getComponents(req, res);
+        if (response?.message) {
+            sendErrorResponse(res, 400, 'AuthRoutes::/register::', response.message);
+        } else {
+            sendSuccessResponse(res, 'Success', response);
+        }
+    } catch (err) {
+        sendErrorResponse(res, 500, 'AuthRoutes::/register::', err);
+    }
+});
+router.post('/roles', async function (req, res, next) {
+    try {
+        const dataToValidate = {
+            name: req.body.name,
+            is_active: req.body.is_active
+        };
+        const { error, value } = roleSchema.validate(dataToValidate);
+        if (error) {
+            sendErrorResponse(res, 400, error.details[0].message, 'Preferences Routes:: save roles');
+        } else {
+            const response = await preferenceController.saveOrUpdateRoles(req, res);
+            if (response.message) {
+                sendErrorResponse(res, 400, 'AuthRoutes::/signin::', response.message);
+            } else {
+                sendSuccessResponse(res, 'Success', response);
+            }
+        }
+    } catch (err) {
+        sendErrorResponse(res, 500, 'AuthRoutes::/signin::', err);
+    }
+});
+router.get('/roles', async function (req, res, next) {
+    try {
+        const response = await preferenceController.getRoles(req, res);
+        if (response?.message) {
+            sendErrorResponse(res, 400, 'AuthRoutes::/register::', response.message);
+        } else {
+            sendSuccessResponse(res, 'Success', response);
+        }
+    } catch (err) {
+        sendErrorResponse(res, 500, 'AuthRoutes::/register::', err);
+    }
+});
+router.post('/maprole', async function (req, res, next) {
+    try {
+        
+            const response = await preferenceController.saveOrUpdateRoleMapping(req, res);
+            if (response.message) {
+                sendErrorResponse(res, 400, 'AuthRoutes::/signin::', response.message);
+            } else {
+                sendSuccessResponse(res, 'Success', response);
+            }
+    } catch (err) {
+        sendErrorResponse(res, 500, 'AuthRoutes::/signin::', err);
+    }
+});
+router.get('/maprole', async function (req, res, next) {
+    try {
+        const response = await preferenceController.getMappedRoles(req, res);
+        if (response?.message) {
+            sendErrorResponse(res, 400, 'AuthRoutes::/register::', response.message);
+        } else {
+            sendSuccessResponse(res, 'Success', response);
+        }
+    } catch (err) {
+        sendErrorResponse(res, 500, 'AuthRoutes::/register::', err);
+    }
+});
 // validators.academy, validateHandlers.validatePayload
 router.post('/academy', upload.fields([
     { name: 'logo', maxCount: 1 }]), async function (req, res, next) {

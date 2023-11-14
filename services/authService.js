@@ -8,15 +8,15 @@ const Users = require('../sequalizeModels/users');
 const sendEmail = require('./sendEmail');
 const config = require('../config/constants');
 const _ = require('lodash');
-const { synchronizeSchema } = require('../config/sequelize');
+const { nonPublicDDl } = require('../tables/non-public/tables');
 
 async function login(req, t) {
     try {
         const { email, password } = req.body;
         
        const selColmns = `id, first_name, last_name, middle_name, email, brand_name, logo, mobile_phone, role, schema_name, password `
-        const query = `SELECT ${selColmns} FROM users where email='${email}'`;
-        const data = await genericService.executeRawSelectQuery(query, 'public', t);
+        const query = `SELECT ${selColmns} FROM public.users where email='${email}'`;
+        const data = await genericService.executeRawSelectQuery(query, t);
         let logginData;
         if(data?.length >0){
             logginData = data[0];
@@ -57,7 +57,7 @@ async function register(req, t) {
         const schemaName = Math.floor(new Date().getTime() / 1000).toString();
         reqObj.schema_name = 's_'+schemaName;
        await genericService.createRecordRaw('users', reqObj, 'public', t);
-       const ddlQuery = ddl.nonPublicDDl[0].replace(/uniqueSchemaName/g, reqObj.schema_name);
+       const ddlQuery = nonPublicDDl[0].replace(/uniqueSchemaName/g, reqObj.schema_name);
        await genericService.copyTables(`CREATE SCHEMA ${reqObj.schema_name} AUTHORIZATION postgres;`+ ddlQuery, t)
         await t.commit();
         return true;

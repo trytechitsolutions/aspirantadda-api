@@ -31,7 +31,7 @@
     "pg-dump": "^0.10.0",
     "pg-hstore": "^2.3.4",
     "pg-promise": "^11.5.4",
-    "sequelize": "^6.33.0",
+    "sequelize": "^6.34.0",
     "swagger-ui-express": "^5.0.0",
     "winston": "^3.10.0",
     "winston-daily-rotate-file": "^4.7.1"
