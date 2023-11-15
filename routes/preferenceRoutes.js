@@ -123,6 +123,18 @@ router.get('/roles', async function (req, res, next) {
         sendErrorResponse(res, 500, 'AuthRoutes::/register::', err);
     }
 });
+router.get('/access/role', async function (req, res, next) {
+    try {
+        const response = await preferenceController.getRoleAccess(req, res);
+        if (response?.message) {
+            sendErrorResponse(res, 400, 'AuthRoutes::/register::', response.message);
+        } else {
+            sendSuccessResponse(res, 'Success', response);
+        }
+    } catch (err) {
+        sendErrorResponse(res, 500, 'AuthRoutes::/register::', err);
+    }
+});
 router.post('/maprole', async function (req, res, next) {
     try {
         

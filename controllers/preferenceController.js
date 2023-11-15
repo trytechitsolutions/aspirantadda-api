@@ -141,6 +141,27 @@ module.exports = {
 
 
     },
+    getRoleAccess: async (req, res) => {
+        const t = await sequelize.transaction();
+        try {
+            const {schemaName, role} = commonService.parseJwt(req.headers.authorization);
+            const query = `select rcm.role_id, rcm.component_id, rcm."read", rcm."write", rcm.edit, rcm."delete", 
+            c."path", c.title from ${schemaName}.role_component_mapping rcm
+            left join components c on c.id = rcm.component_id where role_id = ${role} and c.is_active=true;`
+            const data = await genericService.executeRawSelectQuery(query, t);
+            await t.commit();
+            if (data?.length > 0) {
+                return data;
+            } else {
+                return [];
+            }
+        } catch (err) {
+            await t.rollback();
+            throw err;
+        }
+
+
+    },
     getMappedRoles: async (req, res) => {
         const t = await sequelize.transaction();
         try {
